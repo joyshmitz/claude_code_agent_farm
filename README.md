@@ -46,6 +46,25 @@ alias cc="ENABLE_BACKGROUND_TASKS=1 claude --dangerously-skip-permissions"
 
 This alias will be configured automatically by the setup script.
 
+### Using Other Agent CLIs (OpenCode, Codex, etc.)
+
+The orchestrator doesn't hardcode the `claude` binary — it simply types `cc` into each tmux pane. That means you can point the alias at any interactive coding agent CLI, including npx-style invocations:
+
+```bash
+# OpenCode
+alias cc="npx -y opencode-ai@latest"
+
+# OpenAI Codex CLI
+alias cc="npx -y @openai/codex"
+```
+
+Caveats to be aware of:
+
+- **Monitoring is Claude Code–specific.** Agent readiness detection (the "Welcome to Claude Code!" banner), context-percentage parsing, `/clear` context resets, usage-limit detection, and the `~/.claude/settings.json` backup/corruption checks all assume Claude Code. With another CLI the agents will launch and work on your prompt, but auto-restart, context management, and health checks will be degraded or inert.
+- **npx startup latency multiplies.** Every agent pane pays the npx resolution cost at launch; with many agents, prefer a one-time global install (e.g. `npm i -g @openai/codex`) and alias `cc` to the installed binary.
+- **Pin versions.** `@latest` can change under you mid-farm; pin an exact version for reproducible runs.
+- **`doctor` will complain.** The `claude-code-agent-farm doctor` command checks for the standard Claude alias and will report a non-standard `cc` alias as incorrect — that warning is expected and harmless in this setup.
+
 ## 🚀 Quick Start
 
 ### 1. Clone and Setup
